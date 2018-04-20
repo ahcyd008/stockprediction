@@ -18,11 +18,17 @@ class Stock(object):
         self.quote_ctx = quote_ctx
         self.stock_code = stock_code
         if self.stock_code in market.stocks:
+            self.type = "stock"
             self.name = market.stocks[stock_code]["name"]
             self.lot_size = market.stocks[stock_code]["lot_size"]
+        elif self.stock_code in market.idxs:
+            self.type = "idx"
+            self.name = market.idxs[stock_code]["name"]
+            self.lot_size = market.idxs[stock_code]["lot_size"]
         else:
+            self.type = ""
             self.name = ""
-            self.lot_size = 0
+            self.lot_size = 100
         self.history, self.history_index = self.getHistoryData()
         # self.getAutype()
         # self.getRTData()
@@ -36,6 +42,7 @@ class Stock(object):
     def toJson(self):
         data = {}
         data["name"] = self.name
+        data["type"] = self.type
         data["stock_code"] = self.stock_code
         data["lot_size"] = self.lot_size
         data["history"] = self.history
