@@ -29,7 +29,7 @@ class Stock(object):
             self.type = ""
             self.name = ""
             self.lot_size = 100
-        self.history, self.history_index = self.getHistoryData()
+        self.history, self.history_index, self.key_index = self.getHistoryData()
         # self.getAutype()
         # self.getRTData()
         # self.snapshot = self.getSnapshot()
@@ -49,6 +49,7 @@ class Stock(object):
         # data["snapshot"] = self.snapshot
         # data["quote"] = self.quote
         data["history_index"] = self.history_index
+        data["key_index"] = self.key_index
         return data
 
 
@@ -219,18 +220,35 @@ class Stock(object):
         #columns 'code', 'time_key', 'open', 'close', 'high', 'low', 'pe_ratio', 'turnover_rate', 'volume', 'turnover', 'change_rate'
         history = []
         history_index = []
+        key_index = {}
         for i in data.index:
-            row = {}
+            row = []
+            index = 0
             for col in data.columns:
-                if col in ["volume"]:
-                    row[col] = int(data.loc[i][col])
+                if col in ["time_key", "code"]:
+                    pass
+                elif col in ["volume"]:
+                    if i == 0:
+                        key_index[col] = index
+                        index = index+1
+                    row.append(int(data.loc[i][col]))
                 else:
-                    row[col] = data.loc[i][col]
+                    if i == 0:
+                        key_index[col] = index
+                        index = index+1
+                    row.append(data.loc[i][col])
             if ktype in ["K_DAY", "K_WEEK", "K_MON"]:
                 time_key = tools.string2datetime(data.loc[i]["time_key"], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
-                row["time_key"] = time_key
+                # row.append(time_key)
+                # if i == 0:
+                #     key_index["time_key"] = index
+                #     index = index + 1
                 history_index.append(time_key)
             else:
+                # row.append(data.loc[i]["time_key"])
+                # if i == 0:
+                #     key_index["time_key"] = index
+                #     index = index + 1
                 history_index.append(data.loc[i]["time_key"])
             history.append(row)
-        return history, history_index
+        return history, history_index, key_index

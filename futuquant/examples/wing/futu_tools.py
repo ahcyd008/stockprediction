@@ -2,10 +2,32 @@
 
 import datetime
 import json
+import os
 
 TAG = "futu_tools"
 
 ## 与股票无关工具类
+def check_dir_exist(dirname, create=False, required=False):
+    if not os.path.exists(dirname):
+        if required:
+            print('dir is required!', dirname)
+            exit(1)
+        if create:
+            os.makedirs(dirname)
+            print('create dir:', dirname)
+            return True
+        return False
+    return True
+
+def check_file_exist(filename, required=False):
+    if not os.path.exists(filename):
+        if required:
+            print('filename is required!', filename)
+            exit(1)
+        print('file not exist:', filename)
+        return False
+    print('file exist:', filename)
+    return True
 
 #把字符串转成datetime
 def string2datetime(string, format):
@@ -32,4 +54,9 @@ def storeJson(data, filename):
 def storeString(data, filename):
     with open(filename, 'w') as f:
         f.write(data)
+
+def load_text_lines(filename):
+    with open(filename) as txt_file:
+        lines = txt_file.readlines()
+        return lines
 ##futu 股票相关工具类
